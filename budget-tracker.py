@@ -100,13 +100,23 @@ def aggregator (budgetPlan, expenseList):
 def getHeader ():
     return ['category','budget','costs','difference','entries','unique_days','when_exceeded']
 
+def cell (str, width):
+    return str.ljust(width)
+
 def displayResult (summary):
-    print("\t".join(getHeader()))
+    print("")
+    width = 20
+    lineH = ""
+    for header in getHeader():
+        lineH+=cell(header,width)
+    print(lineH)
+    
     for lineName in summary:
-        lineT = []
+        line = ""
         for header in getHeader():
-            lineT.append(str(summary[lineName][header]))
-        print ("\t".join(lineT))
+            line+= cell(str(summary[lineName][header]),width)
+        print (line)
+    print("")
 
 #############################################################################
 
