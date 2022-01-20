@@ -1,5 +1,7 @@
 import sys
 
+csvSeparator = ";"
+
 def stopWithMessage (message):
     print ("ERROR: "+message)
     sys.exit()
@@ -9,7 +11,7 @@ def readBudgetPlan (src):
     t = {}
     lineNr = 1
     for line in budgetPlanFile:
-        lineT = line.strip().split(";")
+        lineT = line.strip().split(csvSeparator)
         if (len(lineT) == 0):
             print ("skip empty line nr "+str(lineNr))
             continue
@@ -35,7 +37,7 @@ def readExpenseListFile (src):
     t = []
     lineNr = 1
     for line in expenseListFile:
-        lineT = line.strip().split(";")
+        lineT = line.strip().split(csvSeparator)
         if (len(lineT) == 0):
             print ("skip empty line nr "+str(lineNr))
             continue
@@ -118,15 +120,34 @@ def displayResult (summary):
         print (line)
     print("")
 
+def makeOutputFile (summary, summaryFileName):
+    f = open(summaryFileName, "w")
+    f.write(makeCsv(summary))
+    f.close()
+
+def makeCsv (input):
+    csvLines = []
+    csvLines.append(csvSeparator.join(getHeader()))
+    for lineName in input:
+        line = []
+        for header in getHeader():
+            line.append(str(input[lineName][header]))
+        csvLines.append(csvSeparator.join(line))
+    return "\n".join(csvLines) 
+
+
+
 #############################################################################
 
-if len(sys.argv) != 4:
-    print ("usage: "+sys.argv[0]+" <budget_plan> <expense_lis> <summary_file>")
+if len(sys.argv) != 3 and len(sys.argv) != 4:
+    print ("usage: "+sys.argv[0]+" budget_plan expense_list [summary_file]")
     sys.exit()
 
 budgetPlanFileName = sys.argv[1]
 expenseListFileName = sys.argv[2]
-summaryFileName = sys.argv[3]
+
+if len(sys.argv) == 4:
+    summaryFileName = sys.argv[3]
 
 budgetPlan = readBudgetPlan (budgetPlanFileName)
 expenseList = readExpenseListFile (expenseListFileName)
@@ -138,3 +159,6 @@ summary = aggregator (budgetPlan, expenseList)
 #print (summary)
 
 displayResult (summary)
+
+if len(sys.argv) == 4:
+    makeOutputFile (summary, summaryFileName)
