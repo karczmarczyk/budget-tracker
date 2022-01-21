@@ -1,6 +1,9 @@
+import datetime
 import sys
 
 csvSeparator = ";"
+dateFormatPattern = "%d.%m.%Y"
+numberFormatPattern = "{:.2f}"
 
 def stopWithMessage (message):
     print ("ERROR: "+message)
@@ -44,13 +47,19 @@ def readExpenseListFile (src):
         if (len(lineT) != 3):
             stopWithMessage("Line nr "+str(lineNr)+" has wrong number of columns")
         name = lineT[0]
+
         try:
             value = float(lineT[1])
         except ValueError:
             stopWithMessage("Value in line "+str(lineNr)+", \""+str(lineT[1])+"\" is not a number")
-        date = lineT[2]
         
-        t.append({'name': name, 'value': value, 'date': date})
+        try:
+            timestamp = int(datetime.datetime.strptime(lineT[2], dateFormatPattern).strftime("%s"))
+            date = lineT[2]
+        except ValueError:
+            stopWithMessage("This is the incorrect date string format in line "+str(lineNr)+" - \""+str(lineT[2])+"\". It should be DD.MM.YYYY")
+                
+        t.append({'name': name, 'value': value, 'date': date, 'timestamp': timestamp})
         lineNr = lineNr + 1
 
     expenseListFile.close()    
@@ -66,7 +75,7 @@ def aggregator (budgetPlan, expenseList):
         'difference': 0,
         'entries': 0,
         'unique_days': 0,
-        'when_exceeded': ''
+        'when_exceeded': None
     }
     t['all'] = temp
 
@@ -143,12 +152,18 @@ def getFormattedCellValue (value, type):
     match type:
         case 'float':
             value = numberFormat(value)
-
+        case 'date':
+            value = dateFormat(value)
     return value
 
 
 def numberFormat (number):
-    return '{:.2f}'.format(number)
+    return numberFormatPattern.format(number)
+
+def dateFormat (date):
+    if date is None:
+        return ""
+    return date
 
 #############################################################################
 
