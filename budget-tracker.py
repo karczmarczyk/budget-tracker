@@ -64,7 +64,7 @@ def readExpenseListFile (src):
 
     expenseListFile.close()    
     print ("Expense list: "+src+" loaded.")
-    return t
+    return sorted(t, key=lambda x: x['timestamp'])
 
 def aggregator (budgetPlan, expenseList):
     t = {}
@@ -179,6 +179,8 @@ if len(sys.argv) == 4:
 
 budgetPlan = readBudgetPlan (budgetPlanFileName)
 expenseList = readExpenseListFile (expenseListFileName)
+
+print(expenseList)
 
 summary = aggregator (budgetPlan, expenseList)
 
