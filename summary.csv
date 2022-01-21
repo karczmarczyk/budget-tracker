@@ -1,6 +1,6 @@
 category;budget;costs;difference;entries;unique_days;when_exceeded
-all;2700.0;1073.18;1626.82;5;0;
-grocery;500.0;158.18;341.82;3;0;
-bills;1500.0;790.0;710.0;1;0;
-subscriptions;200.0;0;0;0;0;
-party;500.0;125.0;375.0;1;0;
+all;2700.00;1473.18;1226.82;6;0;
+grocery;500.00;558.18;-58.18;4;0;29.01.2022
+bills;1500.00;790.00;710.00;1;0;
+subscriptions;200.00;0.00;0.00;0;0;
+party;500.00;125.00;375.00;1;0;

@@ -90,17 +90,21 @@ def aggregator (budgetPlan, expenseList):
             t[itemName]['costs']+= item['value']
             t[itemName]['difference'] = t[itemName]['budget'] - t[itemName]['costs']
             t[itemName]['entries']+=1
+            if t[itemName]['when_exceeded']=="" and t[itemName]['difference']<=0:
+                t[itemName]['when_exceeded'] = item['date']
 
             t['all']['costs']+= item['value']
             t['all']['difference'] = t['all']['budget'] - t['all']['costs']
             t['all']['entries']+=1
+            if t['all']['when_exceeded']=="" and t['all']['difference']<=0:
+                t['all']['when_exceeded'] = item['date']
         else:
             print ("WARNING: Expense \""+itemName+"\" not found on budget list. SKIP")   
         
     return t
 
 def getHeader ():
-    return ['category','budget','costs','difference','entries','unique_days','when_exceeded']
+    return {'category':"str",'budget':"float",'costs':"float",'difference':"float",'entries':"int",'unique_days':"int",'when_exceeded':"date"}
 
 def cell (str, width):
     return str.ljust(width)
@@ -116,7 +120,7 @@ def displayResult (summary):
     for lineName in summary:
         line = ""
         for header in getHeader():
-            line+= cell(str(summary[lineName][header]),width)
+            line+= cell(str(getFormattedCellValue(summary[lineName][header], getHeader()[header])),width)
         print (line)
     print("")
 
@@ -131,11 +135,20 @@ def makeCsv (input):
     for lineName in input:
         line = []
         for header in getHeader():
-            line.append(str(input[lineName][header]))
+            line.append(str(getFormattedCellValue(input[lineName][header], getHeader()[header])))
         csvLines.append(csvSeparator.join(line))
     return "\n".join(csvLines) 
 
+def getFormattedCellValue (value, type):
+    match type:
+        case 'float':
+            value = numberFormat(value)
 
+    return value
+
+
+def numberFormat (number):
+    return '{:.2f}'.format(number)
 
 #############################################################################
 
@@ -152,13 +165,12 @@ if len(sys.argv) == 4:
 budgetPlan = readBudgetPlan (budgetPlanFileName)
 expenseList = readExpenseListFile (expenseListFileName)
 
-#print (budgetPlan)
-#print (expenseList)
-
 summary = aggregator (budgetPlan, expenseList)
-#print (summary)
 
 displayResult (summary)
 
 if len(sys.argv) == 4:
+    print ("Result saved in "+summaryFileName+".")
     makeOutputFile (summary, summaryFileName)
+
+print("")
